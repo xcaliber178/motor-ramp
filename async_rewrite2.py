@@ -18,7 +18,7 @@ async def check_button():
         if button == True:
             press = True
             print("BUTTON")
-            await asyncio.sleep_ms(5)
+        await asyncio.sleep_ms(5)
 
 async def current_state():
     global state
@@ -43,26 +43,9 @@ async def current_state():
         else:
             await asyncio.sleep_ms(5)
 
-async def ramp():
-    global press
-    while True:
-        if press == True:
-            if state == False:
-                for duty in range(0, 65535, 1):
-                    print(duty)
-                    #pwm_motor.duty_u16(duty)
-                    await asyncio.sleep_ms(10)
-            elif state == True:
-                for duty in range(65535, 0, -1):
-                    print(duty)
-                    #pwm_motor.duty_u16(duty)
-                    await asyncio.sleep_ms(10)
-            press = False
-        await asyncio.sleep_ms(5)
-
 async def main():
-    asyncio.create_task(check_button())
-    asyncio.create_task(current_state())
-    asyncio.create_task(ramp())
+    task0 = asyncio.create_task(check_button())
+    task1 = asyncio.create_task(current_state())
+    await task0
 
 asyncio.run(main())
