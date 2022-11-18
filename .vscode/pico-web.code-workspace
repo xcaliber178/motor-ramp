@@ -1,0 +1,33 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"python.analysis.diagnosticSeverityOverrides": {
+			"reportMissingImports": "none"
+		},
+		"python.analysis.indexing": true,
+		"picowgo.syncFolder": "",
+		"picowgo.pyIgnore": [
+			".picowgo",
+			".vscode",
+			".gitignore",
+			".git",
+			"other",
+			"project.pico-go",
+			"env",
+			"venv",
+			"secrets.py",
+			"LICENSE",
+			"README.md"
+		],
+		"picowgo.statusbarButtons": [
+			"status",
+			"run",
+			"softreset",
+			"upload"
+		]
+	},
+}
