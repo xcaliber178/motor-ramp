@@ -41,7 +41,14 @@ async def motor():
                 
             if state == 1:
                 print("\nStarting motor...")
-                for duty in range(0, 65535, 65):
+                
+                if exit == True:
+                    duty_start = duty_mem
+                    exit = False
+                elif exit == False:
+                    duty_start = 0
+                
+                for duty in range(duty_start, 65535, 65):
                     if press == True:
                         duty_mem = duty
                         exit = True
