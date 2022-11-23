@@ -46,7 +46,8 @@ async def current_state():
                     if press == True:
                         exit == 1
                     await asyncio.sleep_ms(10)
-
+# Verify "while duty" loop
+# Fix "FULL ON" setting to pass when exiting duty loop
                 print("FULL ON")
                 #pwm_motor.duty_u16(65535)
                 await asyncio.sleep_ms(5)
