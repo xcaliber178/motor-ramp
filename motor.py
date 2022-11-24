@@ -1,5 +1,3 @@
-print("\nInitializing...\n")
-
 # CONTROLLER SETTINGS
 Button_Pin = 18 #GPIO
 Button_HIGH_Pin = 19 #GPIO
@@ -31,17 +29,17 @@ PWM_start_val = (PWM_Start / 100) * 65535 # Converts start percentage to a usabl
 PWM_int_up = (65535 - PWM_start_val) // (Ramp_Up_Time * 100) # Calculates step size to meet ramp up time
 PWM_int_dn = -(65535 // (Ramp_Down_Time * 100)) # Calculates step size to meet ramp down time
 
-state = 0
-press = False
+state = 0 # Stores the motors state
+press = False # Temporarily stores a button press
 
-def push():
-    print("\n-----Pushed-----")
+def push(): # Is called by a button press, reads current motor state and flips it
+    print("PRESS\n")
     global state
     global press
-    press = True
-    if state == 0:
+    press = True # Stores button press
+    if state == 0: # OFF -> ON
         state = 1
-    elif state == 1:
+    elif state == 1: # ON -> OFF
         state = 0
 
 async def motor():
@@ -51,7 +49,7 @@ async def motor():
         if press == True:
             press = False
             if state == 1:
-                print("\nStarting motor...")
+                print("STARTING...\n")
                 if exit == True:
                     duty_start = duty_mem
                     exit = False
@@ -66,11 +64,11 @@ async def motor():
                     pwm_motor.duty_u16(duty)
                     await asyncio.sleep_ms(10)
                 if exit != True:
-                    print("\n-----FULL ON-----")
+                    print("FULL ON\n")
                     pwm_motor.duty_u16(65535)
                     await asyncio.sleep_ms(5)
             elif state == 0:
-                print("\nStopping motor...")
+                print("STOPPING...\n")
                 if exit == True:
                     duty_start = duty_mem
                     exit = False
@@ -85,23 +83,23 @@ async def motor():
                     pwm_motor.duty_u16(duty)
                     await asyncio.sleep_ms(10)
                 if exit != True:
-                    print("\n-----FULL OFF-----")
+                    print("FULL OFF\n")
                     pwm_motor.duty_u16(0)
                     await asyncio.sleep_ms(5)
         else:
             await asyncio.sleep_ms(5)
 
-async def hold():
+async def hold(): # Non-terminating reference
     while True:
         await asyncio.sleep(60)
 
-async def main():
-    hold0 = asyncio.create_task(hold())
-    motor0 = asyncio.create_task(motor())
-    await asyncio.sleep_ms(5)
-    pb = Pushbutton(button)
-    pb.press_func(push)
+async def main(): # Asyncio setup
+    hold0 = asyncio.create_task(hold()) # Starts non-terminating reference
+    motor0 = asyncio.create_task(motor()) # Starts primary motor control function
+    await asyncio.sleep_ms(5) # Allows the above function time to initialize
+    pb = Pushbutton(button) # Creates a pushbutton class from the hardware library
+    pb.press_func(push) # Assigns the push() function as the pushbuttons callable
     print("READY!\n")
-    await hold0
+    await hold0 # Non-terminating, keeps program running indefinitely.
 
 asyncio.run(main())
