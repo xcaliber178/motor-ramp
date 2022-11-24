@@ -1,3 +1,5 @@
+print("\nInitializing...\n")
+
 # CONTROLLER SETTINGS
 Button_Pin = 18 #GPIO
 Button_HIGH_Pin = 19 #GPIO
@@ -7,13 +9,6 @@ PWM_Start = 10 #%
 Ramp_Up_Time = 10 #sec
 Ramp_Down_Time = 10 #sec
 
-# Math to pass settings to PWM controls
-PWM_start_val = (PWM_Start / 100) * 65535 # Converts start percentage to a usable integer
-PWM_int_up = (65535 - PWM_start_val) // (Ramp_Up_Time * 100) # Calculates step size to meet ramp up time
-PWM_int_dn = -(65535 // (Ramp_Down_Time * 100)) # Calculates step size to meet ramp down time
-
-print("\nInitializing...\n")
-
 # Imports
 from machine import Pin
 from machine import PWM
@@ -21,19 +16,21 @@ from time import sleep
 from primitives import Pushbutton
 import uasyncio as asyncio
 
-# Set button pins
-button = Pin(Button_Pin, Pin.IN, Pin.PULL_DOWN) # Sense pin
-high = Pin(Button_HIGH_Pin, Pin.OUT) # High pin
-high.on()
-
 # Set PWM pins and settings
 pwm_motor = PWM(Pin(PWM_Pin)) # PWM pin
 pwm_motor.freq(PWM_Freq) # PWM frequency
 pwm_motor.duty_u16(0) # Makes sure PWM is at minimum
 
-PWM_start_val = (PWM_Start / 100) * 65535
-PWM_int_up = (65535 - PWM_start_val) // (Ramp_Up_Time * 100)
-PWM_int_dn = -(65535 // (Ramp_Down_Time * 100))
+# Set button pins
+button = Pin(Button_Pin, Pin.IN, Pin.PULL_DOWN) # Sense pin
+high = Pin(Button_HIGH_Pin, Pin.OUT) # High pin
+high.on()
+
+# Math to pass settings to PWM controls
+PWM_start_val = (PWM_Start / 100) * 65535 # Converts start percentage to a usable integer
+PWM_int_up = (65535 - PWM_start_val) // (Ramp_Up_Time * 100) # Calculates step size to meet ramp up time
+PWM_int_dn = -(65535 // (Ramp_Down_Time * 100)) # Calculates step size to meet ramp down time
+
 state = 0
 press = False
 
