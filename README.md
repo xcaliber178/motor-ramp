@@ -1,5 +1,5 @@
 # motor-ramp
- Implements a ramp up/down period for a motor controller using PWM.
+ Implements a ramp up/down period for a motor controller using PWM and a pushbutton.
 
 ### Use
  Load `main.py` and `lib/` to MCU
@@ -10,4 +10,6 @@
  
  GPIO18 is the sense pin, GPIO19 is HIGH
  
- Duty cycle starts from 0 and maxes at 65535. The minimum value for starting the motor may need adjusted depending on the motor. Currently this is hard coded and will need to be adjusted as such. Eventually I will make this an easily changable constant.
+ The minimum value for starting the motor may need adjusted depending on the motor.
+
+ Pins and PWM values are adjustable at the top of the program file.
