@@ -8,11 +8,11 @@
 Button_Pin = 18 #GPIO
 Button_HIGH_Pin = 19 #GPIO
 PWM_Pin = 13 #GPIO
-PWM_Freq = 20000 #Hz
-PWM_Start = 10 #%
-Ramp_Up_Time = 10 #sec
-Ramp_Down_Time = 10 #sec
-
+PWM_Freq = 10000 #Hz
+PWM_Start = 7.4 #%
+PWM_Max = 20 #%
+Ramp_Up_Time = 20 #sec
+Ramp_Down_Time = 20 #sec
 
 # Imports
 from machine import Pin
@@ -31,9 +31,10 @@ high = Pin(Button_HIGH_Pin, Pin.OUT) # High pin
 high.on() # Enable high pin
 
 # Math to pass settings to PWM controls
-PWM_start_val = (PWM_Start / 100) * 65535 # Converts start percentage to a usable integer
-PWM_int_up = (65535 - PWM_start_val) // (Ramp_Up_Time * 100) # Calculates step size to meet ramp up time
-PWM_int_dn = -(65535 // (Ramp_Down_Time * 100)) # Calculates step size to meet ramp down time
+PWM_start_val = int((PWM_Start / 100) * 65535) # Converts start percentage to a usable integer
+PWM_max_val = int((PWM_Max / 100) * 65535) # Converts start percentage to a usable integer
+PWM_int_up = int((PWM_max_val - PWM_start_val) // (Ramp_Up_Time * 100)) # Calculates step size to meet ramp up time
+PWM_int_dn = -int((PWM_max_val // (Ramp_Down_Time * 100))) # Calculates step size to meet ramp down time
 
 state = 0 # Stores the motors state
 press = False # Temporarily stores a button press
@@ -66,17 +67,17 @@ async def motor():
                     exit = False # Resets the exit event
                 elif exit == False:
                     duty_start = PWM_start_val # Passes the controller setting for PWM
-                for duty in range(duty_start, 65535, PWM_int_up): # Main ramp up loop
+                for duty in range(int(duty_start), PWM_max_val, PWM_int_up): # Main ramp up loop
                     if press == True: # Stores duty cycle value if the button is pressed during ramp up
                         duty_mem = duty
                         exit = True # Stores the exit event
                         break
-                    print(duty)
+                    print(int((duty / 65535) * 100)) # Converts current duty cycle value to percentage (used for setup/diagnostics)
                     pwm_motor.duty_u16(duty)
                     await asyncio.sleep_ms(10)
                 if exit != True: # Finishes off the ramp up loop by setting the duty cycle to max
                     print("FULL ON\n")
-                    pwm_motor.duty_u16(65535)
+                    pwm_motor.duty_u16(PWM_max_val)
                     await asyncio.sleep_ms(5)
 
             elif state == 0: # Motor ramp down
@@ -85,13 +86,13 @@ async def motor():
                     duty_start = duty_mem
                     exit = False # Resets the exit event
                 elif exit == False:
-                    duty_start = 65535
-                for duty in range(duty_start, 0, PWM_int_dn): # Main ramp down loop
+                    duty_start = PWM_max_val
+                for duty in range(int(duty_start), 0, PWM_int_dn): # Main ramp down loop
                     if press == True: # Stores duty cycle value if the button is pressed during ramp down
                         duty_mem = duty
                         exit = True # Stores the exit event
                         break
-                    print(duty)
+                    print(int((duty / 65535) * 100)) # Converts current duty cycle value to percentage (used for setup/diagnostics)
                     pwm_motor.duty_u16(duty)
                     await asyncio.sleep_ms(10)
                 if exit != True: # Finishes off the ramp down loop by setting the duty cycle to zero
@@ -120,4 +121,3 @@ asyncio.run(main()) # Run
 
 if False:
     import this
-    
