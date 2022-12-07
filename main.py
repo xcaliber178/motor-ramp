@@ -9,8 +9,8 @@ Button_Pin = 18 #GPIO
 Button_HIGH_Pin = 19 #GPIO
 PWM_Pin = 13 #GPIO
 PWM_Freq = 10000 #Hz
-PWM_Start = 7.4 #%
-PWM_Max = 20 #%
+PWM_Start = 5 #%
+PWM_Max = 100 #%
 Ramp_Up_Time = 20 #sec
 Ramp_Down_Time = 20 #sec
 
@@ -35,6 +35,13 @@ PWM_start_val = int((PWM_Start / 100) * 65535) # Converts start percentage to a 
 PWM_max_val = int((PWM_Max / 100) * 65535) # Converts start percentage to a usable integer
 PWM_int_up = int((PWM_max_val - PWM_start_val) // (Ramp_Up_Time * 100)) # Calculates step size to meet ramp up time
 PWM_int_dn = -int((PWM_max_val // (Ramp_Down_Time * 100))) # Calculates step size to meet ramp down time
+
+if PWM_Start < 0 or PWM_Start >= 100:
+    raise Exception("PWM_Start is a silly value! You should probably check that.")
+if PWM_Max > 100 or PWM_Max <= 0:
+    raise Exception("PWM_Max is a silly value! You should probably check that.")
+if PWM_Start >= PWM_Max:
+    raise Exception("PWM_Start and PWM_Max are the same...what's that supposed to do?")
 
 state = 0 # Stores the motors state
 press = False # Temporarily stores a button press
@@ -72,7 +79,7 @@ async def motor():
                         duty_mem = duty
                         exit = True # Stores the exit event
                         break
-                    print(int((duty / 65535) * 100)) # Converts current duty cycle value to percentage (used for setup/diagnostics)
+                    print((duty / 65535) * 100) # Converts current duty cycle value to percentage (used for setup/diagnostics)
                     pwm_motor.duty_u16(duty)
                     await asyncio.sleep_ms(10)
                 if exit != True: # Finishes off the ramp up loop by setting the duty cycle to max
@@ -92,7 +99,7 @@ async def motor():
                         duty_mem = duty
                         exit = True # Stores the exit event
                         break
-                    print(int((duty / 65535) * 100)) # Converts current duty cycle value to percentage (used for setup/diagnostics)
+                    print((duty / 65535) * 100) # Converts current duty cycle value to percentage (used for setup/diagnostics)
                     pwm_motor.duty_u16(duty)
                     await asyncio.sleep_ms(10)
                 if exit != True: # Finishes off the ramp down loop by setting the duty cycle to zero
