@@ -14,6 +14,7 @@ PWM_Max = 100 #%
 Ramp_Up_Time = 20 #sec
 Ramp_Down_Time = 20 #sec
 
+
 # Imports
 from machine import Pin
 from machine import PWM
@@ -36,15 +37,20 @@ PWM_max_val = int((PWM_Max / 100) * 65535) # Converts start percentage to a usab
 PWM_int_up = int((PWM_max_val - PWM_start_val) // (Ramp_Up_Time * 100)) # Calculates step size to meet ramp up time
 PWM_int_dn = -int((PWM_max_val // (Ramp_Down_Time * 100))) # Calculates step size to meet ramp down time
 
+state = 0 # Stores the motors state
+press = False # Temporarily stores a button press
+
+# Settings validation
 if PWM_Start < 0 or PWM_Start >= 100:
     raise Exception("PWM_Start is a silly value! You should probably check that.")
 if PWM_Max > 100 or PWM_Max <= 0:
     raise Exception("PWM_Max is a silly value! You should probably check that.")
+if Ramp_Down_Time <= 0:
+    raise Exception("Ramp_Down_Time is a silly value! You should probably check that.")
+if Ramp_Up_Time <= 0:
+    raise Exception("Ramp_Up_Time is a silly value! You should probably check that.")
 if PWM_Start >= PWM_Max:
-    raise Exception("PWM_Start and PWM_Max are the same...what's that supposed to do?")
-
-state = 0 # Stores the motors state
-press = False # Temporarily stores a button press
+    raise Exception("PWM_Start and PWM_Max are the same...why would you even do that?")
 
 
 def push(): # Is called by a button press, reads current motor state and flips it
